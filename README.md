@@ -35,6 +35,10 @@ This repository contains the **nptaniso** series only:
 
 ## 3D viewer
 
+**Online:** https://jmendi.github.io/imidazol_Co/analysis_2026-11-16/traj_viewer/
+
+To run it locally instead:
+
 ```
 cd analysis_2026-11-16/traj_viewer
 python -m http.server 8000
