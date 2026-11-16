@@ -1,6 +1,7 @@
 # Public repository: nptaniso runs only. Everything is ignored except what is listed below.
 /*
 !/.gitignore
+!/.nojekyll
 !/README.md
 !/*.cif
 
