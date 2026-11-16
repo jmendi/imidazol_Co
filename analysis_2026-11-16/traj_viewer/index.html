@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Co–N Trajectory Viewer</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +22,8 @@
 :root[data-theme="dark"] {
   --bg: #0f1215; --panel: #161a1e; --line: #2a3138; --fg: #e8ecef; --fg2: #aab3bb; --muted: #74808b;
   --accent: #5b9bff; --accent-ink: #0b1220; --warn: #ff8a55; --stage: #11151a; --chip: #1f252b; color-scheme: dark }
-html, body { background: var(--bg); color: var(--fg); }
+[hidden] { display: none !important; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; }
 body { font-family: var(--f-body); font-size: 14px; line-height: 1.45;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 16px 28px; }
@@ -172,7 +178,7 @@ async function loadRun(sys, T) {
   $('story').textContent = STORIES[key] || '';
   state.firstView = true;
   $('loading').hidden = true;
-  buildBondList(); drawFrame(); drawChart();
+  buildBondList(); drawChart(); drawFrame();
 }
 
 function buildBondList() {
@@ -191,7 +197,7 @@ function posOf(f, a) {
 }
 
 function drawFrame() {
-  const d = state.data; if (!d || !viewer) return;
+  const d = state.data; if (!d) return;
   const f = state.f, cell = d.cells[f];
   const A = [cell[0], cell[1], cell[2]], B = [cell[3], cell[4], cell[5]], C = [cell[6], cell[7], cell[8]];
   const [ni, nj, nk] = $('optImg').value.split(',').map(Number);
@@ -206,6 +212,20 @@ function drawFrame() {
     }
   }
   const xyz = `${lines.length}\n\n${lines.join('\n')}`;
+  try { render3D(d, f, xyz, A, B, C); }
+  catch (e) {
+    $('loading').hidden = false;
+    $('loading').textContent = 'The 3D view could not start (WebGL is off or failed in this browser). The distance trace below still works.';
+  }
+  const t = d.t[f];
+  $('hudT').textContent = t.toFixed(2);
+  $('hudPhase').textContent = t < 1 ? 'warm-up (heating)' : 'production';
+  $('frame').value = f;
+  drawCursor();
+}
+
+function render3D(d, f, xyz, A, B, C) {
+  if (!viewer) throw new Error('no WebGL viewer');
   viewer.removeAllModels(); viewer.removeAllShapes(); viewer.removeAllLabels();
   const m = viewer.addModel(xyz, 'xyz');
   const st = $('optStyle').value;
@@ -244,11 +264,6 @@ function drawFrame() {
   });
   if (state.firstView) { viewer.zoomTo(); state.firstView = false; }
   viewer.render();
-  const t = d.t[f];
-  $('hudT').textContent = t.toFixed(2);
-  $('hudPhase').textContent = t < 1 ? 'warm-up (heating)' : 'production';
-  $('frame').value = f;
-  drawCursor();
 }
 
 /* ---- Co–N trace ---- */
@@ -353,10 +368,12 @@ window.addEventListener('resize', () => { if (viewer) { viewer.resize(); viewer.
 
 (async function init() {
   if (typeof $3Dmol === 'undefined') { $('loading').textContent = 'The 3D library did not load. Check your connection and reload.'; return; }
-  makeViewer();
+  try { makeViewer(); } catch (e) { viewer = null; }
   try { state.index = await (await fetch('data/index.json')).json(); }
   catch (e) { $('loading').textContent = 'Could not load the run list. Reload the page to try again.'; return; }
   buildPicker();
   await loadRun(state.sys, state.T);
 })();
 </script>
+
+</html>
