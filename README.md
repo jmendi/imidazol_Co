@@ -47,7 +47,9 @@ Then open http://localhost:8000. The viewer shows every run at one frame per 40 
 
 ## Trajectories
 
-The full trajectories (one frame per fs) are attached to the GitHub release `traj-2026-11-16`, compressed with xz. Each asset is named after its path with `/` replaced by `__`. For example:
+**Download:** https://github.com/jmendi/imidazol_Co/releases/tag/traj-2026-11-16
+
+The full trajectories (one frame per fs) are attached to that release, compressed with xz. It holds 30 files: warm-up and production for each of the 15 runs. Each asset is named after its path with `/` replaced by `__`. For example:
 
 ```
 gh release download traj-2026-11-16 -R jmendi/imidazol_Co -p 'Co_1MIm__nptaniso_450__*'
