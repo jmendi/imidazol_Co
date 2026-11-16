@@ -1,0 +1,18 @@
+run                              over        a        b        c         V    dV %
+Co_1MIm/nptaniso_300       production    7.494   10.066   15.282    1148.3   -4.74
+Co_1MIm/nptaniso_350       production    7.667    9.992   15.108    1155.9   -4.11
+Co_1MIm/nptaniso_400       production    7.450   10.375   15.758    1216.3   +0.90
+Co_1MIm/nptaniso_450       production    7.544   10.477   15.092    1188.7   -1.39
+Co_1MIm/nptaniso_500       production    7.697   10.388   15.096    1202.9   -0.21
+Co_12dMIm/nptaniso_300     production    8.747   13.402   14.271    1653.5   -2.98
+Co_12dMIm/nptaniso_350     production    9.062   13.098   14.341    1687.8   -0.97
+Co_12dMIm/nptaniso_400     production   10.013   12.443   13.910    1726.2   +1.28
+Co_12dMIm/nptaniso_450     production    9.958   12.592   13.964    1735.6   +1.83
+Co_12dMIm/nptaniso_500     production    9.435   12.677   14.444    1722.7   +1.07
+CoSCN2bIm2/nptaniso_300    production    6.634   14.811   17.974    1748.5   -3.38
+CoSCN2bIm2/nptaniso_350    production    6.546   14.894   18.372    1761.5   -2.66
+CoSCN2bIm2/nptaniso_400    production    7.567   15.370   15.957    1803.9   -0.32
+CoSCN2bIm2/nptaniso_450    production    7.517   14.825   16.117    1761.2   -2.68
+CoSCN2bIm2/nptaniso_500    production    7.523   14.818   16.297    1781.8   -1.54
+
+wrote /home/jesus/fast05/imidazol_Co/cif_runs/fig_cell_nptaniso.png and .pdf

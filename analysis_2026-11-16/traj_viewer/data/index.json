@@ -1,0 +1,156 @@
+[
+ {
+  "file": "Co_1MIm_300.json",
+  "system": "Co_1MIm",
+  "T": 300,
+  "nframes": 412,
+  "tmax": 16.44,
+  "watched": [
+   "Co0\u2013N6",
+   "Co0\u2013N8",
+   "Co1\u2013N23",
+   "Co1\u2013N25"
+  ]
+ },
+ {
+  "file": "Co_1MIm_350.json",
+  "system": "Co_1MIm",
+  "T": 350,
+  "nframes": 418,
+  "tmax": 16.68,
+  "watched": [
+   "Co0\u2013N6",
+   "Co0\u2013N8",
+   "Co1\u2013N7",
+   "Co1\u2013N9"
+  ]
+ },
+ {
+  "file": "Co_1MIm_400.json",
+  "system": "Co_1MIm",
+  "T": 400,
+  "nframes": 437,
+  "tmax": 17.44,
+  "watched": [
+   "Co0\u2013N6",
+   "Co0\u2013N8",
+   "Co1\u2013N7",
+   "Co1\u2013N9"
+  ]
+ },
+ {
+  "file": "Co_1MIm_450.json",
+  "system": "Co_1MIm",
+  "T": 450,
+  "nframes": 424,
+  "tmax": 16.92,
+  "watched": [
+   "Co0\u2013N6",
+   "Co0\u2013N8",
+   "Co1\u2013N15",
+   "Co1\u2013N17"
+  ]
+ },
+ {
+  "file": "Co_1MIm_500.json",
+  "system": "Co_1MIm",
+  "T": 500,
+  "nframes": 432,
+  "tmax": 17.24,
+  "watched": [
+   "Co0\u2013N14",
+   "Co0\u2013N16",
+   "Co1\u2013N7",
+   "Co1\u2013N9"
+  ]
+ },
+ {
+  "file": "Co_12dMIm_300.json",
+  "system": "Co_12dMIm",
+  "T": 300,
+  "nframes": 368,
+  "tmax": 14.68,
+  "watched": []
+ },
+ {
+  "file": "Co_12dMIm_350.json",
+  "system": "Co_12dMIm",
+  "T": 350,
+  "nframes": 367,
+  "tmax": 14.64,
+  "watched": []
+ },
+ {
+  "file": "Co_12dMIm_400.json",
+  "system": "Co_12dMIm",
+  "T": 400,
+  "nframes": 371,
+  "tmax": 14.8,
+  "watched": []
+ },
+ {
+  "file": "Co_12dMIm_450.json",
+  "system": "Co_12dMIm",
+  "T": 450,
+  "nframes": 367,
+  "tmax": 14.64,
+  "watched": []
+ },
+ {
+  "file": "Co_12dMIm_500.json",
+  "system": "Co_12dMIm",
+  "T": 500,
+  "nframes": 363,
+  "tmax": 14.48,
+  "watched": []
+ },
+ {
+  "file": "CoSCN2bIm2_300.json",
+  "system": "CoSCN2bIm2",
+  "T": 300,
+  "nframes": 373,
+  "tmax": 14.88,
+  "watched": []
+ },
+ {
+  "file": "CoSCN2bIm2_350.json",
+  "system": "CoSCN2bIm2",
+  "T": 350,
+  "nframes": 369,
+  "tmax": 14.72,
+  "watched": []
+ },
+ {
+  "file": "CoSCN2bIm2_400.json",
+  "system": "CoSCN2bIm2",
+  "T": 400,
+  "nframes": 373,
+  "tmax": 14.88,
+  "watched": [
+   "Co0\u2013N12"
+  ]
+ },
+ {
+  "file": "CoSCN2bIm2_450.json",
+  "system": "CoSCN2bIm2",
+  "T": 450,
+  "nframes": 363,
+  "tmax": 14.48,
+  "watched": [
+   "Co2\u2013N14",
+   "Co3\u2013N15"
+  ]
+ },
+ {
+  "file": "CoSCN2bIm2_500.json",
+  "system": "CoSCN2bIm2",
+  "T": 500,
+  "nframes": 363,
+  "tmax": 14.48,
+  "watched": [
+   "Co0\u2013N12",
+   "Co1\u2013N13",
+   "Co3\u2013N19"
+  ]
+ }
+]

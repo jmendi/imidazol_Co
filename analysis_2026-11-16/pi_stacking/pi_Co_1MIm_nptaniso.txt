@@ -1,0 +1,23 @@
+== Co_1MIm nptaniso 300 K: 1643 frames to 16.4 ps, 8 azole ligands, Co-N > 2.6 A at the end: none, > 3.5 A: none
+   contacts per cell: 100 K frame 0, 2nd half mean 0.00 +/- 0.00
+   pair (ligands, image)      present    d_cc   angle   perp   slip  (2nd half; present = fraction of 2nd half in contact)  100 K: d_cc angle
+== Co_1MIm nptaniso 350 K: 1662 frames to 16.6 ps, 8 azole ligands, Co-N > 2.6 A at the end: [0, 2], > 3.5 A: none
+   contacts per cell: 100 K frame 0, 2nd half mean 0.00 +/- 0.00
+   pair (ligands, image)      present    d_cc   angle   perp   slip  (2nd half; present = fraction of 2nd half in contact)  100 K: d_cc angle
+== Co_1MIm nptaniso 400 K: 1742 frames to 17.4 ps, 8 azole ligands, Co-N > 2.6 A at the end: [0, 1, 2, 3], > 3.5 A: none
+   contacts per cell: 100 K frame 0, 2nd half mean 1.62 +/- 0.59
+   pair (ligands, image)      present    d_cc   angle   perp   slip  (2nd half; present = fraction of 2nd half in contact)  100 K: d_cc angle
+   L3*-L5 (1,0,0)                0.84    3.95   21.6   3.33   2.06       5.05  69.6   (new)
+   L2*-L4 (-1,0,0)               0.77    3.97   20.6   3.39   2.00       4.87  63.5   (new)
+== Co_1MIm nptaniso 450 K: 1691 frames to 16.9 ps, 8 azole ligands, Co-N > 2.6 A at the end: [5, 7], > 3.5 A: [5, 7]
+   contacts per cell: 100 K frame 0, 2nd half mean 2.77 +/- 0.44
+   pair (ligands, image)      present    d_cc   angle   perp   slip  (2nd half; present = fraction of 2nd half in contact)  100 K: d_cc angle
+   L1-L7** (-1,0,0)              0.98    3.67   12.2   3.47   1.13       5.06  80.4   (new)
+   L3-L5** (1,0,0)               0.94    3.72   15.2   3.57   0.95       5.05  69.6   (new)
+   L5**-L7** (-1,-1,0)           0.86    3.85   15.6   3.57   1.32       7.80   6.5   (new)
+== Co_1MIm nptaniso 500 K: 1725 frames to 17.2 ps, 8 azole ligands, Co-N > 2.6 A at the end: [4, 6], > 3.5 A: [4, 6]
+   contacts per cell: 100 K frame 0, 2nd half mean 2.79 +/- 0.43
+   pair (ligands, image)      present    d_cc   angle   perp   slip  (2nd half; present = fraction of 2nd half in contact)  100 K: d_cc angle
+   L0-L6** (1,0,0)               0.97    3.70   13.8   3.44   1.25       5.00  77.8   (new)
+   L2-L4** (-1,0,0)              0.97    3.70   12.8   3.44   1.29       4.87  63.5   (new)
+   L4**-L6** (1,-1,0)            0.85    3.91   14.7   3.60   1.40       7.83   1.1   (new)

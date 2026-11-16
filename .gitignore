@@ -1,0 +1,55 @@
+# Public repository: nptaniso runs only. Everything is ignored except what is listed below.
+/*
+!/.gitignore
+!/README.md
+!/*.cif
+
+# scripts used to run and analyse the nptaniso series
+!/md_fireballpy_aniso.py
+!/run_cif_heat.sh
+!/extend_npt_runs.sh
+!/resubmit_cif_heat.sh
+!/npt_status.py
+!/fig_cell_npt.py
+!/fig_coN_heat.py
+!/bond_break_study.py
+!/pi_stacking_study.py
+
+# run folders: nptaniso only (trajectories are in the GitHub release)
+!/cif_runs/
+/cif_runs/*
+!/cif_runs/Co_1MIm/
+!/cif_runs/Co_12dMIm/
+!/cif_runs/CoSCN2bIm2/
+/cif_runs/*/*
+!/cif_runs/*/nptaniso_[0-9]*/
+
+# analysis: nptaniso files only
+!/analysis_2026-11-16/
+/analysis_2026-11-16/*
+!/analysis_2026-11-16/bond_breaking/
+!/analysis_2026-11-16/pi_stacking/
+!/analysis_2026-11-16/scheme/
+!/analysis_2026-11-16/traj_viewer/
+!/analysis_2026-11-16/cells/
+/analysis_2026-11-16/cells/*
+!/analysis_2026-11-16/cells/*nptaniso.*
+!/analysis_2026-11-16/coN/
+/analysis_2026-11-16/coN/*
+!/analysis_2026-11-16/coN/*nptaniso.*
+!/analysis_2026-11-16/CN/
+/analysis_2026-11-16/CN/*
+!/analysis_2026-11-16/CN/*nptaniso.*
+!/analysis_2026-11-16/status/
+/analysis_2026-11-16/status/*
+!/analysis_2026-11-16/status/*nptaniso.*
+!/analysis_2026-11-16/status/nptaniso_status.png
+
+# large or machine-specific files
+answer.xyz
+md.out
+*.npz
+slurm-*
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

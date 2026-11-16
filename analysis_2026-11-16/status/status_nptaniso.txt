@@ -1,0 +1,18 @@
+run                      stage    step  s/step    left   <T> K  V/V_cif  <P> GPa
+Co_1MIm/nptaniso_300     prod    16376    69.9    284h   294.8   0.9596    0.186
+Co_1MIm/nptaniso_350     prod    16557    67.6    271h   351.4   0.9374    0.671
+Co_1MIm/nptaniso_400     prod    17351    60.0    227h   407.6   1.0097    0.225
+Co_1MIm/nptaniso_450     prod    16850    62.7    246h   457.4   0.9462    0.899
+Co_1MIm/nptaniso_500     prod    17178    61.9    238h   488.2   0.9991   -0.449
+Co_12dMIm/nptaniso_300   prod    14649   109.6    498h   297.2   0.9932   -0.044
+Co_12dMIm/nptaniso_350   prod    14600   111.2    507h   350.3   0.9867   -0.396
+Co_12dMIm/nptaniso_400   prod    14729    94.8    428h   391.2   1.0334   -0.032
+Co_12dMIm/nptaniso_450   prod    14573    93.8    428h   449.7   1.0622   -0.389
+Co_12dMIm/nptaniso_500   prod    14445   101.4    466h   491.7   0.9943   -0.164
+CoSCN2bIm2/nptaniso_300  prod    14823   100.8    453h   289.9   0.9673   -0.073
+CoSCN2bIm2/nptaniso_350  prod    14666    93.3    423h   352.1   0.9701    0.093
+CoSCN2bIm2/nptaniso_400  prod    14810    80.0    360h   391.0   1.0028   -0.129
+CoSCN2bIm2/nptaniso_450  prod    14450   105.6    485h   488.8   0.9790    0.157
+CoSCN2bIm2/nptaniso_500  prod    14435   117.1    539h   504.9   0.9874   -0.559
+
+figure: /home/jesus/fast05/imidazol_Co/cif_runs/nptaniso_status.png

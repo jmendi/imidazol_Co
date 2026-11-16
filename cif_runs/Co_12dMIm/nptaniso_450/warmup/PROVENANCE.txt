@@ -1,0 +1,9 @@
+created   2026-10-22 15:29:31
+source    /home/jesus/imidazol_Co/cif_runs/Co_12dMIm/md_100/answer.xyz
+frame     1000 of 1001 (step 1000)
+etot      -20167.365614 eV
+cell      copied from /home/jesus/imidazol_Co/cif_runs/Co_12dMIm/md_100/input.lvs
+
+Geometry only: velocities are re-drawn from a Maxwell-Boltzmann
+distribution at the new target temperature by md_fireballpy.py.
+Discard the first ~1 ps as equilibration to the new temperature.

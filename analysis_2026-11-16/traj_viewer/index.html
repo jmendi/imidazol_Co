@@ -1,0 +1,362 @@
+<title>Co–N Trajectory Viewer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: instrument console. Run picker on top, 3D stage + side notes, Co–N trace underneath acting as the scrubber. */
+:root {
+  --bg: #f6f7f8; --panel: #ffffff; --line: #dde1e5; --fg: #15191d; --fg2: #4d565e; --muted: #87909a;
+  --accent: #2a6fdb; --accent-ink: #ffffff; --warn: #e2622b; --stage: #fbfcfd; --chip: #eef1f4;
+  --f-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1215; --panel: #161a1e; --line: #2a3138; --fg: #e8ecef; --fg2: #aab3bb; --muted: #74808b;
+  --accent: #5b9bff; --accent-ink: #0b1220; --warn: #ff8a55; --stage: #11151a; --chip: #1f252b; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1215; --panel: #161a1e; --line: #2a3138; --fg: #e8ecef; --fg2: #aab3bb; --muted: #74808b;
+  --accent: #5b9bff; --accent-ink: #0b1220; --warn: #ff8a55; --stage: #11151a; --chip: #1f252b; color-scheme: dark }
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--f-body); font-size: 14px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 28px; }
+.wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 14px; }
+header { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: baseline; justify-content: space-between; }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: 1.35rem; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--fg2); font-size: 0.86rem; }
+.picker { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.group > span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-right: 2px; }
+button.chip { font: 500 0.85rem var(--f-body); border: 1px solid var(--line); background: var(--panel); color: var(--fg);
+  padding: 5px 11px; border-radius: 6px; cursor: pointer; }
+button.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button.chip:focus-visible, button.icon:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; }
+@media (max-width: 860px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; background: var(--stage); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  height: min(64vh, 620px); min-height: 320px; }
+#mol { position: absolute; inset: 0; }
+.hud { position: absolute; left: 12px; top: 10px; font: 500 0.82rem var(--f-mono); color: var(--fg2); pointer-events: none;
+  display: grid; gap: 2px; font-variant-numeric: tabular-nums; }
+.hud b { color: var(--fg); font-weight: 500; }
+.legend { position: absolute; right: 12px; bottom: 10px; display: flex; gap: 10px; font-size: 0.75rem; color: var(--fg2); flex-wrap: wrap; justify-content: flex-end; }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 0.9rem; }
+aside { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; }
+.card h2 { font: 600 0.78rem var(--f-body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; }
+.card p { margin: 0; color: var(--fg2); font-size: 0.88rem; }
+.toggles { display: grid; gap: 7px; font-size: 0.88rem; }
+.toggles label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.toggles select { font: inherit; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; }
+.bondlist { display: grid; gap: 4px; font: 0.82rem var(--f-mono); font-variant-numeric: tabular-nums; }
+.bondlist div { display: flex; justify-content: space-between; gap: 8px; }
+.bondlist i { display: inline-block; width: 14px; height: 3px; margin-right: 6px; vertical-align: 3px; border-radius: 2px; }
+.long { color: var(--warn); }
+.transport { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+button.icon { font: 600 0.9rem var(--f-body); border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+  border-radius: 6px; padding: 6px 14px; cursor: pointer; min-width: 84px; }
+.transport label { font-size: 0.82rem; color: var(--fg2); display: flex; gap: 6px; align-items: center; }
+#frame { flex: 1 1 220px; min-width: 0; accent-color: var(--accent); }
+.chartbox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px 6px; display: grid; gap: 6px; }
+.chartbox .row { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 0.8rem; color: var(--fg2); }
+#chart { width: 100%; height: 190px; display: block; cursor: crosshair; touch-action: none; }
+.note { font-size: 0.78rem; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Co–N Trajectory Viewer</h1>
+      <div class="sub">Fireball MD, flexible cell at P = 0 (nptaniso), every 40 fs of warm-up + production</div>
+    </div>
+    <div class="picker">
+      <div class="group" id="sysGroup"><span>System</span></div>
+      <div class="group" id="tGroup"><span>T</span></div>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="stage">
+      <div id="mol"></div>
+      <div class="hud"><div>t = <b id="hudT">0.00</b> ps</div><div id="hudPhase">warm-up</div></div>
+      <div class="legend">
+        <span><i style="background:#3b6fb6"></i>Co</span><span><i style="background:#2a78d6"></i>N</span>
+        <span><i style="background:#909090"></i>C</span><span><i style="background:#d9a400"></i>S</span>
+        <span><i style="background:#e2622b"></i>watched Co–N</span>
+      </div>
+      <div class="loading" id="loading">Loading trajectory…</div>
+    </div>
+    <aside>
+      <div class="card"><h2>What happens in this run</h2><p id="story"></p></div>
+      <div class="card"><h2>Watched Co–N bonds</h2><div class="bondlist" id="bondlist"></div>
+        <p class="note">Bonds whose 100 fs mean ends above 2.4 Å or peaks above 2.45 Å. Dashed tube in 3D, same colour as in the trace.</p></div>
+      <div class="card"><h2>Display</h2>
+        <div class="toggles">
+          <label><input type="checkbox" id="optCell" checked> Cell box</label>
+          <label><input type="checkbox" id="optH" checked> Hydrogens</label>
+          <label><input type="checkbox" id="optLabels" checked> Distance labels</label>
+          <label>Periodic images <select id="optImg">
+            <option value="1,1,1">1 × 1 × 1</option><option value="2,1,1">2 × 1 × 1</option><option value="1,2,1">1 × 2 × 1</option><option value="1,1,2">1 × 1 × 2</option>
+            <option value="2,2,1">2 × 2 × 1</option><option value="2,2,2">2 × 2 × 2</option></select></label>
+          <label>Style <select id="optStyle"><option value="bs">Ball and stick</option><option value="stick">Sticks</option><option value="sphere">Space filling</option></select></label>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="transport">
+    <button class="icon" id="play" type="button">Play</button>
+    <input type="range" id="frame" min="0" max="0" value="0" aria-label="Frame">
+    <label>Speed <select id="speed"><option value="4">slow</option><option value="10" selected>normal</option><option value="24">fast</option></select></label>
+  </div>
+
+  <div class="chartbox">
+    <div class="row"><span>Co–N distance (100 fs running mean) — click or drag to jump</span><span>dashed: 2.6 Å coordination cutoff · grey band: warm-up</span></div>
+    <canvas id="chart"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/3dmol@2.1.0/build/3Dmol-min.js"></script>
+<script>
+const STORIES = {
+  'Co_1MIm_300': 'The NCS pair on Co1 elongates to about 2.8 Å within the first picosecond (the closed-shell Jahn–Teller axis). Imidazole pairs on Co0 stay near 2.4 Å. Nothing leaves.',
+  'Co_1MIm_350': 'The imidazole pair on Co0 (N6, N8) slowly lengthens from about 2.4 to 2.8 Å and only passes 2.6 Å near the end (about 16 ps). The Co1 imidazoles stay bound. Nothing leaves.',
+  'Co_12dMIm_350': 'All four ligands stay on every Co (Co–N ≤ 2.5 Å). No bond is watched in this run.',
+  'CoSCN2bIm2_350': 'All Co stay tetrahedral (Co–N ≤ 2.3 Å). At 5–6 ps the flexible cell shears (β drops below 80°) and two extra benzimidazole π stacks form and stay.',
+  'Co_1MIm_400': 'On both Co one trans imidazole pair elongates to about 2.9 Å ("4+2"). The elongated rings form loose slipped π contacts (3.95 Å) with neighbours, but stay pointing at their Co.',
+  'Co_1MIm_450': 'Co1 loses its axial imidazole pair (N15, N17). Step 1 at about 1 ps: both to about 3 Å. Step 2 at 4–8 ps: out to 4.2–4.5 Å, the rings rotate about 60° and stack face-to-face on an imidazole of Co0 and on each other. Co1 ends square-planar.',
+  'Co_1MIm_500': 'Co0 loses its axial imidazole pair (N14, N16) at 2–5 ps, with the same rotation and π stacking as at 450 K. The Co1 pair stays at about 2.6 Å.',
+  'Co_12dMIm_300': 'All four ligands stay on every Co (Co–N ≤ 2.5 Å); the tetrahedra only vibrate. No bond is watched in this run.',
+  'Co_12dMIm_400': 'All Co keep four ligands. The flexible cell keeps changing shape (a grows by about 13 % while c shrinks), without any bond breaking.',
+  'Co_12dMIm_450': 'All Co keep four ligands. The cell axis a grows by about 17 % and c shrinks; the methyl C–H···S contacts thin out with temperature.',
+  'Co_12dMIm_500': 'All Co keep four ligands even at 500 K: larger vibrations and fewer methyl C–H···S contacts, but no ligand loss and no melting.',
+  'CoSCN2bIm2_300': 'All Co stay tetrahedral (Co–N ≤ 2.3 Å). Around 13 ps the flexible cell shears (β below 80°) and two extra benzimidazole π stacks form.',
+  'CoSCN2bIm2_400': 'All Co stay four-coordinate. Co0–N12 reaches 2.54 Å once and comes back. The benzimidazole π columns along a are kept.',
+  'CoSCN2bIm2_450': 'Co2 and Co3 flatten to "3+1" at 0.6–1.1 ps, during warm-up: the Co drops into the plane of its other three N and the benzimidazole (N14, N15) ends 2.9 Å away, still pointing at it. Its N–H···S bond breaks a few hundred fs later; the π column stays.',
+  'CoSCN2bIm2_500': 'Co0 and Co1 flatten to "3+1" at about 0.6 ps (N12, N13 at 2.9 Å). Co3–N19 makes one excursion to about 2.5 Å and returns.',
+};
+const COLORS = ['#e2622b', '#2a9d8f', '#b5179e', '#e9a400', '#4361ee', '#6a994e'];
+const ELEM = { Co: '#3b6fb6', N: '#2a78d6', C: '#909090', S: '#d9a400', H: '#e8e8e8' };
+const RAD = { Co: 0.42, N: 0.26, C: 0.25, S: 0.34, H: 0.15 };
+
+const $ = id => document.getElementById(id);
+const state = { index: [], sys: 'Co_1MIm', T: 450, data: null, pos: null, f: 0, playing: false, cache: {}, firstView: true };
+let viewer = null;
+
+function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+function decode(b64) {
+  const bin = atob(b64); const buf = new ArrayBuffer(bin.length); const u8 = new Uint8Array(buf);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return new Int16Array(buf);
+}
+
+async function loadRun(sys, T) {
+  const key = `${sys}_${T}`;
+  $('loading').hidden = false;
+  try {
+    if (!state.cache[key]) {
+      const r = await fetch(`data/${key}.json`);
+      if (!r.ok) throw new Error(r.status);
+      const d = await r.json(); d.q = decode(d.pos); delete d.pos; state.cache[key] = d;
+    }
+  } catch (e) {
+    $('loading').textContent = `Could not load ${key} (${e.message}). Reload the page to try again.`;
+    return;
+  }
+  state.data = state.cache[key]; state.sys = sys; state.T = T;
+  state.f = Math.min(state.f, state.data.nframes - 1);
+  $('frame').max = state.data.nframes - 1; $('frame').value = state.f;
+  $('story').textContent = STORIES[key] || '';
+  state.firstView = true;
+  $('loading').hidden = true;
+  buildBondList(); drawFrame(); drawChart();
+}
+
+function buildBondList() {
+  const el = $('bondlist'); el.innerHTML = '';
+  if (!state.data.watched.length) { el.innerHTML = '<div><span>none above 2.4 Å</span></div>'; return; }
+  state.data.watched.forEach((w, i) => {
+    const row = document.createElement('div');
+    row.innerHTML = `<span><i style="background:${COLORS[i % COLORS.length]}"></i>${w.label}</span><span data-w="${i}"></span>`;
+    el.appendChild(row);
+  });
+}
+
+function posOf(f, a) {
+  const d = state.data, o = (f * d.natoms + a) * 3, q = d.q;
+  return [q[o] / 100, q[o + 1] / 100, q[o + 2] / 100];
+}
+
+function drawFrame() {
+  const d = state.data; if (!d || !viewer) return;
+  const f = state.f, cell = d.cells[f];
+  const A = [cell[0], cell[1], cell[2]], B = [cell[3], cell[4], cell[5]], C = [cell[6], cell[7], cell[8]];
+  const [ni, nj, nk] = $('optImg').value.split(',').map(Number);
+  const showH = $('optH').checked;
+  const lines = [];
+  for (let i = 0; i < ni; i++) for (let j = 0; j < nj; j++) for (let k = 0; k < nk; k++) {
+    const sh = [0, 1, 2].map(x => i * A[x] + j * B[x] + k * C[x]);
+    for (let a = 0; a < d.natoms; a++) {
+      if (!showH && d.sym[a] === 'H') continue;
+      const p = posOf(f, a);
+      lines.push(`${d.sym[a]} ${(p[0] + sh[0]).toFixed(2)} ${(p[1] + sh[1]).toFixed(2)} ${(p[2] + sh[2]).toFixed(2)}`);
+    }
+  }
+  const xyz = `${lines.length}\n\n${lines.join('\n')}`;
+  viewer.removeAllModels(); viewer.removeAllShapes(); viewer.removeAllLabels();
+  const m = viewer.addModel(xyz, 'xyz');
+  const st = $('optStyle').value;
+  for (const el of Object.keys(ELEM)) {
+    const col = ELEM[el];
+    let s;
+    if (st === 'bs') s = { stick: { radius: 0.11, color: col }, sphere: { radius: RAD[el], color: col } };
+    else if (st === 'stick') s = { stick: { radius: 0.14, color: col } };
+    else s = { sphere: { scale: 0.85, color: col } };
+    m.setStyle({ elem: el }, s);
+  }
+  if ($('optCell').checked) {
+    const O = d.origin, add = (p, v) => p.map((x, t) => x + v[t]);
+    const corners = {};
+    for (const a of [0, 1]) for (const b of [0, 1]) for (const c of [0, 1])
+      corners[`${a}${b}${c}`] = [0, 1, 2].map(t => O[t] + a * A[t] + b * B[t] + c * C[t]);
+    const edges = [['000','100'],['000','010'],['000','001'],['100','110'],['100','101'],['010','110'],['010','011'],['001','101'],['001','011'],['110','111'],['101','111'],['011','111']];
+    const lc = cssVar('--muted');
+    for (const [p, q] of edges) {
+      const P = corners[p], Q = corners[q];
+      viewer.addLine({ start: { x: P[0], y: P[1], z: P[2] }, end: { x: Q[0], y: Q[1], z: Q[2] }, color: lc, dashed: false });
+    }
+  }
+  d.watched.forEach((w, i) => {
+    const pc = posOf(f, w.co), pn = posOf(f, w.n);
+    const r = Math.hypot(pc[0] - pn[0], pc[1] - pn[1], pc[2] - pn[2]);
+    const col = COLORS[i % COLORS.length];
+    viewer.addCylinder({ start: { x: pc[0], y: pc[1], z: pc[2] }, end: { x: pn[0], y: pn[1], z: pn[2] },
+      radius: 0.07, color: col, dashed: true, fromCap: 1, toCap: 1 });
+    if ($('optLabels').checked) {
+      viewer.addLabel(`${r.toFixed(2)} Å`, { position: { x: (pc[0] + pn[0]) / 2, y: (pc[1] + pn[1]) / 2, z: (pc[2] + pn[2]) / 2 },
+        fontSize: 11, fontColor: '#ffffff', backgroundColor: col, backgroundOpacity: 0.85, inFront: true, showBackground: true });
+    }
+    const span = document.querySelector(`[data-w="${i}"]`);
+    if (span) { span.textContent = `${r.toFixed(2)} Å`; span.className = r > 2.6 ? 'long' : ''; }
+  });
+  if (state.firstView) { viewer.zoomTo(); state.firstView = false; }
+  viewer.render();
+  const t = d.t[f];
+  $('hudT').textContent = t.toFixed(2);
+  $('hudPhase').textContent = t < 1 ? 'warm-up (heating)' : 'production';
+  $('frame').value = f;
+  drawCursor();
+}
+
+/* ---- Co–N trace ---- */
+let chartGeom = null;
+function drawChart() {
+  const cv = $('chart'), d = state.data; if (!d) return;
+  const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const L = 40, R = 10, T = 8, B = 22, tmax = d.t[d.t.length - 1];
+  let ymax = 2.8; d.watched.forEach(w => w.r.forEach(v => { if (v > ymax) ymax = v; }));
+  ymax = Math.ceil(ymax * 2) / 2; const ymin = 1.8;
+  const X = t => L + (W - L - R) * t / tmax, Y = v => T + (H - T - B) * (1 - (v - ymin) / (ymax - ymin));
+  chartGeom = { X, L, R, W, tmax };
+  const fg2 = cssVar('--fg2'), line = cssVar('--line'), muted = cssVar('--muted'), chip = cssVar('--chip');
+  g.fillStyle = chip; g.fillRect(X(0), T, X(1) - X(0), H - T - B);
+  g.font = '11px "IBM Plex Mono", monospace'; g.fillStyle = fg2; g.strokeStyle = line; g.lineWidth = 1;
+  for (let v = 2.0; v <= ymax + 1e-6; v += 0.5) {
+    g.beginPath(); g.moveTo(L, Y(v)); g.lineTo(W - R, Y(v)); g.stroke();
+    g.textAlign = 'right'; g.textBaseline = 'middle'; g.fillText(v.toFixed(1), L - 6, Y(v));
+  }
+  const step = tmax > 12 ? 2.5 : 2;
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  for (let t = 0; t <= tmax + 1e-6; t += step) g.fillText(`${t}`, X(t), H - B + 5);
+  g.textAlign = 'right'; g.fillText('ps', W - R, H - B + 5);
+  g.setLineDash([4, 4]); g.strokeStyle = muted; g.beginPath(); g.moveTo(L, Y(2.6)); g.lineTo(W - R, Y(2.6)); g.stroke(); g.setLineDash([]);
+  d.watched.forEach((w, i) => {
+    g.strokeStyle = COLORS[i % COLORS.length]; g.lineWidth = 1.6; g.beginPath();
+    w.r.forEach((v, k) => { const x = X(d.t[k]), y = Y(v); k ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+  });
+  if (!d.watched.length) { g.fillStyle = muted; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('no Co–N bond above 2.4 Å in this run', W / 2, H / 2); }
+  chartBase = g.getImageData(0, 0, cv.width, cv.height);
+  drawCursor();
+}
+let chartBase = null;
+function drawCursor() {
+  const cv = $('chart'), d = state.data; if (!chartBase || !chartGeom || !d) return;
+  const g = cv.getContext('2d'); g.putImageData(chartBase, 0, 0);
+  const dpr = window.devicePixelRatio || 1; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const x = chartGeom.X(d.t[state.f]);
+  g.strokeStyle = cssVar('--fg'); g.lineWidth = 1; g.beginPath(); g.moveTo(x, 6); g.lineTo(x, cv.clientHeight - 20); g.stroke();
+}
+function seekFromEvent(ev) {
+  const d = state.data; if (!d || !chartGeom) return;
+  const rect = $('chart').getBoundingClientRect();
+  const t = Math.max(0, Math.min(chartGeom.tmax, (ev.clientX - rect.left - chartGeom.L) / (rect.width - chartGeom.L - chartGeom.R) * chartGeom.tmax));
+  let k = 0; while (k < d.t.length - 1 && d.t[k] < t) k++;
+  state.f = k; drawFrame();
+}
+let dragging = false;
+$('chart').addEventListener('pointerdown', e => { dragging = true; $('chart').setPointerCapture(e.pointerId); seekFromEvent(e); });
+$('chart').addEventListener('pointermove', e => { if (dragging) seekFromEvent(e); });
+$('chart').addEventListener('pointerup', () => { dragging = false; });
+
+/* ---- playback ---- */
+let last = 0;
+function tick(ts) {
+  if (!state.playing) return;
+  const fps = Number($('speed').value);
+  if (ts - last >= 1000 / fps) {
+    last = ts; state.f = (state.f + 1) % state.data.nframes; drawFrame();
+  }
+  requestAnimationFrame(tick);
+}
+function setPlaying(p) {
+  state.playing = p; $('play').textContent = p ? 'Pause' : 'Play';
+  if (p) requestAnimationFrame(tick);
+}
+$('play').addEventListener('click', () => setPlaying(!state.playing));
+$('frame').addEventListener('input', e => { state.f = Number(e.target.value); drawFrame(); });
+['optCell', 'optH', 'optLabels', 'optImg', 'optStyle'].forEach(id => $(id).addEventListener('change', () => {
+  if (id === 'optImg') state.firstView = true; drawFrame(); }));
+
+/* ---- run picker ---- */
+function buildPicker() {
+  const systems = [...new Set(state.index.map(r => r.system))];
+  const sg = $('sysGroup'), tg = $('tGroup');
+  sg.querySelectorAll('button').forEach(b => b.remove());
+  systems.forEach(s => {
+    const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = s;
+    b.setAttribute('aria-pressed', s === state.sys); b.addEventListener('click', () => { state.sys = s; buildPicker(); loadRun(state.sys, state.T); });
+    sg.appendChild(b);
+  });
+  tg.querySelectorAll('button').forEach(b => b.remove());
+  const Ts = state.index.filter(r => r.system === state.sys).map(r => r.T);
+  if (!Ts.includes(state.T)) state.T = Ts[Ts.length - 1];
+  Ts.forEach(T => {
+    const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = `${T} K`;
+    b.setAttribute('aria-pressed', T === state.T); b.addEventListener('click', () => { state.T = T; buildPicker(); loadRun(state.sys, state.T); });
+    tg.appendChild(b);
+  });
+}
+
+function makeViewer() {
+  viewer = $3Dmol.createViewer($('mol'), { backgroundColor: cssVar('--stage'), antialias: true });
+}
+const mq = window.matchMedia('(prefers-color-scheme: dark)');
+function retheme() { if (viewer) { viewer.setBackgroundColor(cssVar('--stage')); drawFrame(); } drawChart(); }
+mq.addEventListener?.('change', retheme);
+new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+window.addEventListener('resize', () => { if (viewer) { viewer.resize(); viewer.render(); } drawChart(); });
+
+(async function init() {
+  if (typeof $3Dmol === 'undefined') { $('loading').textContent = 'The 3D library did not load. Check your connection and reload.'; return; }
+  makeViewer();
+  try { state.index = await (await fetch('data/index.json')).json(); }
+  catch (e) { $('loading').textContent = 'Could not load the run list. Reload the page to try again.'; return; }
+  buildPicker();
+  await loadRun(state.sys, state.T);
+})();
+</script>
